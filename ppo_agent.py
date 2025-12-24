@@ -9,6 +9,13 @@ from torch.distributions import Normal
 import numpy as np
 
 
+def orthogonal_init(layer, gain=1.0):
+    """Orthogonal initialization for better exploration"""
+    if isinstance(layer, nn.Linear):
+        nn.init.orthogonal_(layer.weight, gain=gain)
+        nn.init.constant_(layer.bias, 0)
+
+
 class ActorCritic(nn.Module):
     """
     Actor-Critic网络（连续动作空间）
@@ -33,19 +40,18 @@ class ActorCritic(nn.Module):
             nn.ReLU()
         )
         
-        # Actor头：输出动作均值
+        # Actor头：输出动作均值（使用tanh限制输出范围到[-1, 1]，然后乘以max_speed）
         self.actor_mean = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, action_dim)
+            nn.Linear(hidden_dim, action_dim),
+            nn.Tanh()  # Limit output to [-1, 1] range
         )
         
         # Actor头：输出动作标准差的对数
-        self.actor_logstd = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, action_dim)
-        )
+        # Use learnable parameter instead of network output for better initialization
+        # Initialize to -0.5 so std ≈ 0.6, which is reasonable for [-1, 1] action space
+        self.actor_logstd = nn.Parameter(torch.full((action_dim,), -0.5))
         
         # Critic头：输出状态价值
         self.critic = nn.Sequential(
@@ -53,6 +59,26 @@ class ActorCritic(nn.Module):
             nn.ReLU(),
             nn.Linear(hidden_dim, 1)
         )
+        
+        # Initialize network weights for better exploration
+        self._init_weights()
+    
+    def _init_weights(self):
+        """Initialize network weights using orthogonal initialization"""
+        # Initialize feature layers with standard gain
+        for layer in self.feature:
+            if isinstance(layer, nn.Linear):
+                orthogonal_init(layer, gain=np.sqrt(2))
+        
+        # Initialize actor mean layers with small gain to encourage exploration
+        for layer in self.actor_mean:
+            if isinstance(layer, nn.Linear):
+                orthogonal_init(layer, gain=0.01)  # Small gain for last layer
+        
+        # Initialize critic layers
+        for layer in self.critic:
+            if isinstance(layer, nn.Linear):
+                orthogonal_init(layer, gain=np.sqrt(2))
     
     def forward(self, state):
         """
@@ -68,7 +94,8 @@ class ActorCritic(nn.Module):
         """
         features = self.feature(state)
         action_mean = self.actor_mean(features)
-        action_logstd = self.actor_logstd(features)
+        # Use learnable parameter, expand to batch size
+        action_logstd = self.actor_logstd.unsqueeze(0).expand(action_mean.size(0), -1)
         # 限制log_std的范围
         action_logstd = torch.clamp(action_logstd, self.log_std_min, self.log_std_max)
         state_value = self.critic(features)
@@ -82,7 +109,7 @@ class ActorCritic(nn.Module):
             state: [state_dim] or [batch_size, state_dim]
         
         Returns:
-            action: [action_dim] or [batch_size, action_dim] 选择的动作
+            action: [action_dim] or [batch_size, action_dim] 选择的动作（已缩放到[-max_speed, max_speed]）
             action_logprob: 动作的对数概率
             state_value: 状态价值
         """
@@ -90,10 +117,16 @@ class ActorCritic(nn.Module):
             state = state.unsqueeze(0)
         
         action_mean, action_logstd, state_value = self.forward(state)
+        # action_mean is already in [-1, 1] range due to Tanh
+        # Scale to action space range (will be done in environment, but we can also do it here)
+        # For now, let environment handle the scaling based on max_speed
+        
         action_std = torch.exp(action_logstd)
         
         dist = Normal(action_mean, action_std)
         action = dist.sample()
+        # Clip action to [-1, 1] to ensure it stays in valid range
+        action = torch.clamp(action, -1.0, 1.0)
         action_logprob = dist.log_prob(action).sum(dim=-1)  # 对动作维度求和
         
         # 如果是单样本，返回numpy数组
@@ -108,7 +141,7 @@ class ActorCritic(nn.Module):
         
         Args:
             state: [batch_size, state_dim]
-            action: [batch_size, action_dim]
+            action: [batch_size, action_dim] (expected in [-1, 1] range)
         
         Returns:
             action_logprob: [batch_size]
@@ -117,6 +150,9 @@ class ActorCritic(nn.Module):
         """
         action_mean, action_logstd, state_value = self.forward(state)
         action_std = torch.exp(action_logstd)
+        
+        # Ensure action is in valid range [-1, 1]
+        action = torch.clamp(action, -1.0, 1.0)
         
         dist = Normal(action_mean, action_std)
         action_logprob = dist.log_prob(action).sum(dim=-1)  # 对动作维度求和
@@ -165,7 +201,7 @@ class PPO:
         # 使用不同的学习率
         self.optimizer = optim.Adam([
             {'params': self.policy.actor_mean.parameters(), 'lr': lr_actor},
-            {'params': self.policy.actor_logstd.parameters(), 'lr': lr_actor},
+            {'params': [self.policy.actor_logstd], 'lr': lr_actor},  # Learnable parameter
             {'params': self.policy.critic.parameters(), 'lr': lr_critic},
             {'params': self.policy.feature.parameters(), 'lr': lr_actor}
         ])
@@ -233,18 +269,19 @@ class PPO:
             _, old_state_values, _ = self.policy_old.evaluate(old_states, old_actions)
             old_state_values = old_state_values.squeeze()
         
-        # 计算下一个状态的价值（用于TD误差）
+        # 计算下一个状态的价值（用于TD误差）- 向量化实现
         next_values = torch.zeros_like(old_state_values)
-        for i in range(len(old_state_values) - 1):
-            if not dones[i]:
-                next_values[i] = old_state_values[i + 1]
+        # 使用roll操作和mask来向量化
+        next_values[:-1] = old_state_values[1:] * (1 - dones[:-1])
         
         # 计算TD误差: δ_t = r_t + γV(s_{t+1}) - V(s_t)
         td_errors = rewards + self.gamma * next_values * (1 - dones) - old_state_values
         
         # 使用GAE计算优势函数: A_t = δ_t + (γλ)δ_{t+1} + (γλ)²δ_{t+2} + ...
+        # 向量化实现：从后向前累积
         advantages = torch.zeros_like(td_errors)
         last_gae = 0.0
+        # 使用向量化操作，但需要处理done标志
         for t in reversed(range(len(td_errors))):
             if dones[t]:
                 last_gae = td_errors[t]
