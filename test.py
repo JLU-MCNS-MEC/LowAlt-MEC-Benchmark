@@ -42,7 +42,7 @@ def test(model_path, num_episodes=10, render=True):
     os.makedirs('plots', exist_ok=True)
     
     # Create environment
-    env = DronePathPlanningEnv(world_size=100, max_steps=500)
+    env = DronePathPlanningEnv(world_size=1000, max_steps=60)
     state_dim = env.observation_space.shape[0]
     # Continuous action space: action_dim is the dimension of action space (vx, vy = 2)
     action_dim = env.action_space.shape[0]
@@ -64,7 +64,7 @@ def test(model_path, num_episodes=10, render=True):
         trajectory = [env.drone_pos.copy()]
         reached_target = False
         
-        for step in range(500):
+        for step in range(60):
             action = agent.select_action(state)
             next_state, reward, terminated, truncated, info = env.step(action)
             
@@ -113,11 +113,11 @@ def plot_trajectory(trajectory, target_pos, episode, reached_target):
     plt.plot(target_pos[0], target_pos[1], 'r*', markersize=15, label='Target')
     
     # Draw target area
-    circle = plt.Circle(target_pos, 2.0, color='r', alpha=0.2, label='Target Area')
+    circle = plt.Circle(target_pos, 20.0, color='r', alpha=0.2, label='Target Area')
     plt.gca().add_patch(circle)
     
-    plt.xlim([0, 100])
-    plt.ylim([0, 100])
+    plt.xlim([0, 1000])
+    plt.ylim([0, 1000])
     plt.xlabel('X Coordinate', fontsize=12)
     plt.ylabel('Y Coordinate', fontsize=12)
     status = "Success" if reached_target else "Failed"
