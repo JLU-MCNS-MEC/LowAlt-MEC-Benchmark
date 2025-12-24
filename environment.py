@@ -21,11 +21,12 @@ class DronePathPlanningEnv(gym.Env):
     - Continuous velocity control (vx, vy) ∈ [-max_speed, max_speed]
     """
     
-    def __init__(self, world_size=100, max_steps=500, max_speed=2.0, dt=0.1, 
-                 arrival_threshold=2.0, arrival_reward=50.0,  # Reduced from 100.0
-                 progress_weight=100.0,  # Increased from 50.0 for stronger signal
+    def __init__(self, world_size=1000, max_steps=60, max_speed=20.0, dt=1.0, 
+                 arrival_threshold=20.0, arrival_reward=100.0,  # Scaled for 1000m world
+                 progress_weight=100.0,  # Increased for stronger progress signal
                  step_penalty=0.01,  # Increased from 0.001
-                 boundary_penalty_weight=5.0, smoothness_weight=0.1):
+                 boundary_penalty_weight=5.0, smoothness_weight=0.1,
+                 fixed_start_pos=None, fixed_target_pos=None):
         """
         Initialize environment
         
@@ -40,6 +41,8 @@ class DronePathPlanningEnv(gym.Env):
             step_penalty: Penalty per step (default: 0.001)
             boundary_penalty_weight: Weight for boundary violation penalty (default: 5.0)
             smoothness_weight: Weight for smoothness penalty (default: 0.1)
+            fixed_start_pos: Fixed starting position [x, y]. If None, uses random position
+            fixed_target_pos: Fixed target position [x, y]. If None, uses random position
         """
         super().__init__()
         
@@ -53,6 +56,23 @@ class DronePathPlanningEnv(gym.Env):
         self.step_penalty = step_penalty
         self.boundary_penalty_weight = boundary_penalty_weight
         self.smoothness_weight = smoothness_weight
+        
+        # Fixed positions (if provided)
+        if fixed_start_pos is not None:
+            self.fixed_start_pos = np.array(fixed_start_pos, dtype=np.float32)
+        else:
+            # Default fixed position: center-left of the world
+            self.fixed_start_pos = np.array([world_size * 0.1, world_size * 0.5], dtype=np.float32)
+        
+        if fixed_target_pos is not None:
+            self.fixed_target_pos = np.array(fixed_target_pos, dtype=np.float32)
+        else:
+            # Default fixed position: center-right of the world
+            self.fixed_target_pos = np.array([world_size * 0.9, world_size * 0.5], dtype=np.float32)
+        
+        # Ensure fixed positions are within bounds
+        self.fixed_start_pos = np.clip(self.fixed_start_pos, 0, world_size)
+        self.fixed_target_pos = np.clip(self.fixed_target_pos, 0, world_size)
         
         # Action space: continuous velocity (vx, vy)
         self.action_space = spaces.Box(
@@ -76,27 +96,12 @@ class DronePathPlanningEnv(gym.Env):
         self.reset()
     
     def reset(self, seed=None, options=None):
-        """Reset environment"""
+        """Reset environment - uses fixed positions"""
         super().reset(seed=seed)
         
-        # Random initial drone position
-        self.drone_pos = np.random.uniform(
-            [0, 0], 
-            [self.world_size, self.world_size]
-        ).astype(np.float32)
-        
-        # Random target position
-        self.target_pos = np.random.uniform(
-            [0, 0], 
-            [self.world_size, self.world_size]
-        ).astype(np.float32)
-        
-        # Ensure target is not too close to start
-        while np.linalg.norm(self.target_pos - self.drone_pos) < 5:
-            self.target_pos = np.random.uniform(
-                [0, 0], 
-                [self.world_size, self.world_size]
-            ).astype(np.float32)
+        # Use fixed positions (same for every episode)
+        self.drone_pos = self.fixed_start_pos.copy()
+        self.target_pos = self.fixed_target_pos.copy()
         
         self.step_count = 0
         self.prev_distance = np.linalg.norm(self.target_pos - self.drone_pos)
@@ -142,10 +147,11 @@ class DronePathPlanningEnv(gym.Env):
     
     def step(self, action):
         """Execute one step"""
-        # action is [vx, vy] velocity vector
-        vx, vy = action[0], action[1]
+        # action is [vx, vy] velocity vector (expected in [-1, 1] range from actor)
+        # Scale to actual velocity range [-max_speed, max_speed]
+        vx, vy = action[0] * self.max_speed, action[1] * self.max_speed
         
-        # Limit speed magnitude
+        # Limit speed magnitude (safety check)
         speed = np.sqrt(vx**2 + vy**2)
         if speed > self.max_speed:
             vx = vx / speed * self.max_speed
@@ -187,14 +193,20 @@ class DronePathPlanningEnv(gym.Env):
         
         # Calculate distance (before updating prev_distance)
         distance = np.linalg.norm(self.target_pos - self.drone_pos)
-        
-        # Calculate reward using current prev_distance (before update)
-        reward = self._compute_reward(distance, boundary_violation, boundary_penalty, current_velocity)
-        
+
+        # Remove speed adjustment when close to target - let agent learn naturally
+        # The previous logic was causing issues: it would slow down too much near target
+
         # Check termination conditions
         reached_target = distance < self.arrival_threshold
         truncated = self.step_count >= self.max_steps
         terminated = reached_target
+        
+        # Calculate reward using current prev_distance (before update)
+        if not reached_target:
+            reward = self._compute_reward(distance, boundary_violation, boundary_penalty, current_velocity)
+        else:
+            reward = self.arrival_reward
         
         # Get observation with current velocity
         observation = self._get_observation(current_velocity)
@@ -223,18 +235,20 @@ class DronePathPlanningEnv(gym.Env):
         4. Step penalty
         5. Smoothness penalty (optional)
         """
-        # Arrival reward
-        if distance < self.arrival_threshold:
-            return self.arrival_reward
-        
+        # Arrival reward (if reached target) - scaled for larger world
+        success_radius = self.world_size * 0.2  # 20% of world size
+        w_funnel = 3
+        if distance < success_radius:
+            success_funnel_reward = w_funnel * ((success_radius - distance) / success_radius) ** 2
+        else:
+            success_funnel_reward = 0.0
+
         # Distance progress reward (main shaping signal)
-        # Normalize progress by world_size for consistent scaling
+        # Use absolute progress instead of normalized to provide stronger signal
         progress = self.prev_distance - distance
-        normalized_progress = progress / self.world_size
-        progress_reward = self.progress_weight * normalized_progress
-        
-        # Add small distance shaping reward (encourages getting closer)
-        distance_shaping = -0.1 * (distance / self.world_size)
+        # Scale progress reward: 1m progress = progress_weight reward
+        # This provides much stronger signal than normalization
+        progress_reward = self.progress_weight * (progress / 100.0)  # Scale by 100m instead of world_size    
         
         # Boundary violation penalty (proportional to penetration depth)
         if boundary_violation:
@@ -242,17 +256,17 @@ class DronePathPlanningEnv(gym.Env):
         else:
             boundary_penalty_reward = 0.0
         
-        # Step penalty
-        step_penalty_reward = -self.step_penalty
+        # Step penalty - removed to encourage exploration
+        # Only apply minimal penalty to prevent infinite episodes
+        step_penalty_reward = -self.step_penalty * 0.01
         
-        # Smoothness penalty (penalize large velocity changes)
-        smoothness_penalty_reward = 0.0
-        if velocity is not None and self.smoothness_weight > 0:
-            velocity_change = np.linalg.norm(velocity - self.prev_velocity)
-            smoothness_penalty_reward = -self.smoothness_weight * (velocity_change ** 2)
+        # Smoothness penalty (penalize large velocity changes) - further reduced
+        # Only penalize very large changes to allow exploration
+        velocity_change = np.linalg.norm(velocity - self.prev_velocity)
+        smoothness_reward = -0.001 * min(velocity_change**2, 100.0)  # Cap penalty
         
-        total_reward = progress_reward + distance_shaping + boundary_penalty_reward + step_penalty_reward + smoothness_penalty_reward
-        
+        total_reward = success_funnel_reward + progress_reward + boundary_penalty_reward + step_penalty_reward + smoothness_reward
+
         return total_reward
     
     def render(self):
