@@ -1,0 +1,702 @@
+================================================================================
+Scenario Training Summary
+================================================================================
+
+Total scenarios: 84
+Long-training scenarios (>= 200 episodes): 2
+  Scenario numbers: [1, 16]
+
+================================================================================
+
+Scenario 1:
+  Episode range: 0 - 499
+  Total episodes: 499
+  Start position: (200.0, 200.0)
+  Target position: (470.0, 560.0)
+  Distance: 450.0m
+  Final success rate: 50.0%
+  ⚠️  LONG TRAINING SCENARIO
+  Checkpoint: ppo_model_scenario_1_episode_499.pth
+
+Scenario 2:
+  Episode range: 499 - 534
+  Total episodes: 35
+  Start position: (857.5, 567.6)
+  Target position: (435.9, 691.0)
+  Distance: 439.2m
+  Final success rate: 56.7%
+
+Scenario 3:
+  Episode range: 534 - 686
+  Total episodes: 152
+  Start position: (152.5, 528.8)
+  Target position: (435.6, 162.9)
+  Distance: 462.6m
+  Final success rate: 50.0%
+
+Scenario 4:
+  Episode range: 686 - 721
+  Total episodes: 35
+  Start position: (80.3, 184.1)
+  Target position: (451.9, 534.7)
+  Distance: 510.9m
+  Final success rate: 73.3%
+
+Scenario 5:
+  Episode range: 721 - 760
+  Total episodes: 39
+  Start position: (538.6, 801.8)
+  Target position: (39.8, 561.0)
+  Distance: 553.8m
+  Final success rate: 50.0%
+
+Scenario 6:
+  Episode range: 760 - 795
+  Total episodes: 35
+  Start position: (549.9, 413.5)
+  Target position: (279.9, 916.5)
+  Distance: 570.8m
+  Final success rate: 100.0%
+
+Scenario 7:
+  Episode range: 795 - 830
+  Total episodes: 35
+  Start position: (609.3, 655.8)
+  Target position: (705.1, 122.0)
+  Distance: 542.4m
+  Final success rate: 53.3%
+
+Scenario 8:
+  Episode range: 830 - 865
+  Total episodes: 35
+  Start position: (135.5, 795.9)
+  Target position: (389.1, 270.0)
+  Distance: 583.9m
+  Final success rate: 70.0%
+
+Scenario 9:
+  Episode range: 865 - 900
+  Total episodes: 35
+  Start position: (621.6, 58.8)
+  Target position: (575.1, 614.5)
+  Distance: 557.6m
+  Final success rate: 100.0%
+
+Scenario 10:
+  Episode range: 900 - 935
+  Total episodes: 35
+  Start position: (541.4, 253.9)
+  Target position: (637.6, 800.4)
+  Distance: 554.9m
+  Final success rate: 100.0%
+
+Scenario 11:
+  Episode range: 935 - 970
+  Total episodes: 35
+  Start position: (50.6, 582.7)
+  Target position: (583.5, 849.4)
+  Distance: 595.9m
+  Final success rate: 93.3%
+
+Scenario 12:
+  Episode range: 970 - 1027
+  Total episodes: 57
+  Start position: (63.8, 507.2)
+  Target position: (605.7, 710.2)
+  Distance: 578.7m
+  Final success rate: 50.0%
+
+Scenario 13:
+  Episode range: 1027 - 1062
+  Total episodes: 35
+  Start position: (52.8, 188.0)
+  Target position: (255.2, 737.1)
+  Distance: 585.2m
+  Final success rate: 76.7%
+
+Scenario 14:
+  Episode range: 1062 - 1097
+  Total episodes: 35
+  Start position: (932.8, 147.4)
+  Target position: (349.5, 48.5)
+  Distance: 591.7m
+  Final success rate: 96.7%
+
+Scenario 15:
+  Episode range: 1097 - 1132
+  Total episodes: 35
+  Start position: (894.1, 291.5)
+  Target position: (350.2, 80.7)
+  Distance: 583.4m
+  Final success rate: 93.3%
+
+Scenario 16:
+  Episode range: 1132 - 1516
+  Total episodes: 384
+  Start position: (50.9, 303.8)
+  Target position: (619.0, 238.4)
+  Distance: 571.9m
+  Final success rate: 50.0%
+  ⚠️  LONG TRAINING SCENARIO
+  Checkpoint: ppo_model_scenario_16_episode_1516.pth
+
+Scenario 17:
+  Episode range: 1516 - 1551
+  Total episodes: 35
+  Start position: (490.4, 565.6)
+  Target position: (942.6, 868.0)
+  Distance: 544.0m
+  Final success rate: 86.7%
+
+Scenario 18:
+  Episode range: 1551 - 1617
+  Total episodes: 66
+  Start position: (933.6, 338.3)
+  Target position: (393.4, 157.7)
+  Distance: 569.6m
+  Final success rate: 50.0%
+
+Scenario 19:
+  Episode range: 1617 - 1652
+  Total episodes: 35
+  Start position: (238.8, 326.2)
+  Target position: (805.1, 283.1)
+  Distance: 567.9m
+  Final success rate: 100.0%
+
+Scenario 20:
+  Episode range: 1652 - 1687
+  Total episodes: 35
+  Start position: (536.4, 947.2)
+  Target position: (954.6, 606.1)
+  Distance: 539.7m
+  Final success rate: 90.0%
+
+Scenario 21:
+  Episode range: 1687 - 1722
+  Total episodes: 35
+  Start position: (787.1, 846.2)
+  Target position: (922.0, 272.0)
+  Distance: 589.8m
+  Final success rate: 86.7%
+
+Scenario 22:
+  Episode range: 1722 - 1757
+  Total episodes: 35
+  Start position: (229.8, 664.8)
+  Target position: (522.1, 183.1)
+  Distance: 563.4m
+  Final success rate: 96.7%
+
+Scenario 23:
+  Episode range: 1757 - 1817
+  Total episodes: 60
+  Start position: (651.8, 601.1)
+  Target position: (887.7, 67.8)
+  Distance: 583.1m
+  Final success rate: 50.0%
+
+Scenario 24:
+  Episode range: 1817 - 1852
+  Total episodes: 35
+  Start position: (486.3, 465.1)
+  Target position: (883.1, 907.1)
+  Distance: 594.0m
+  Final success rate: 86.7%
+
+Scenario 25:
+  Episode range: 1852 - 1887
+  Total episodes: 35
+  Start position: (433.7, 174.7)
+  Target position: (155.3, 685.8)
+  Distance: 581.9m
+  Final success rate: 100.0%
+
+Scenario 26:
+  Episode range: 1887 - 1922
+  Total episodes: 35
+  Start position: (633.0, 544.0)
+  Target position: (123.9, 255.0)
+  Distance: 585.4m
+  Final success rate: 96.7%
+
+Scenario 27:
+  Episode range: 1922 - 1957
+  Total episodes: 35
+  Start position: (390.2, 176.0)
+  Target position: (727.5, 649.0)
+  Distance: 581.0m
+  Final success rate: 96.7%
+
+Scenario 28:
+  Episode range: 1957 - 1992
+  Total episodes: 35
+  Start position: (248.7, 436.8)
+  Target position: (742.1, 727.1)
+  Distance: 572.4m
+  Final success rate: 100.0%
+
+Scenario 29:
+  Episode range: 1992 - 2027
+  Total episodes: 35
+  Start position: (818.0, 406.3)
+  Target position: (223.2, 346.2)
+  Distance: 597.8m
+  Final success rate: 100.0%
+
+Scenario 30:
+  Episode range: 2027 - 2062
+  Total episodes: 35
+  Start position: (103.6, 661.0)
+  Target position: (563.2, 290.8)
+  Distance: 590.1m
+  Final success rate: 100.0%
+
+Scenario 31:
+  Episode range: 2062 - 2097
+  Total episodes: 35
+  Start position: (300.6, 206.3)
+  Target position: (153.8, 780.5)
+  Distance: 592.7m
+  Final success rate: 100.0%
+
+Scenario 32:
+  Episode range: 2097 - 2132
+  Total episodes: 35
+  Start position: (644.0, 243.7)
+  Target position: (106.5, 488.7)
+  Distance: 590.8m
+  Final success rate: 96.7%
+
+Scenario 33:
+  Episode range: 2132 - 2167
+  Total episodes: 35
+  Start position: (949.5, 257.3)
+  Target position: (868.6, 822.9)
+  Distance: 571.4m
+  Final success rate: 100.0%
+
+Scenario 34:
+  Episode range: 2167 - 2202
+  Total episodes: 35
+  Start position: (728.7, 687.4)
+  Target position: (657.4, 102.6)
+  Distance: 589.1m
+  Final success rate: 100.0%
+
+Scenario 35:
+  Episode range: 2202 - 2237
+  Total episodes: 35
+  Start position: (241.1, 454.7)
+  Target position: (712.3, 782.4)
+  Distance: 574.0m
+  Final success rate: 100.0%
+
+Scenario 36:
+  Episode range: 2237 - 2272
+  Total episodes: 35
+  Start position: (612.8, 773.7)
+  Target position: (723.3, 219.5)
+  Distance: 565.2m
+  Final success rate: 100.0%
+
+Scenario 37:
+  Episode range: 2272 - 2307
+  Total episodes: 35
+  Start position: (774.3, 886.2)
+  Target position: (912.6, 350.8)
+  Distance: 553.0m
+  Final success rate: 100.0%
+
+Scenario 38:
+  Episode range: 2307 - 2342
+  Total episodes: 35
+  Start position: (837.5, 926.3)
+  Target position: (361.4, 677.6)
+  Distance: 537.1m
+  Final success rate: 100.0%
+
+Scenario 39:
+  Episode range: 2342 - 2377
+  Total episodes: 35
+  Start position: (380.9, 892.7)
+  Target position: (920.5, 773.2)
+  Distance: 552.7m
+  Final success rate: 100.0%
+
+Scenario 40:
+  Episode range: 2377 - 2412
+  Total episodes: 35
+  Start position: (78.1, 711.8)
+  Target position: (634.9, 897.2)
+  Distance: 586.9m
+  Final success rate: 100.0%
+
+Scenario 41:
+  Episode range: 2412 - 2447
+  Total episodes: 35
+  Start position: (109.8, 77.6)
+  Target position: (416.2, 572.1)
+  Distance: 581.8m
+  Final success rate: 100.0%
+
+Scenario 42:
+  Episode range: 2447 - 2482
+  Total episodes: 35
+  Start position: (148.4, 646.6)
+  Target position: (708.3, 752.3)
+  Distance: 569.9m
+  Final success rate: 100.0%
+
+Scenario 43:
+  Episode range: 2482 - 2517
+  Total episodes: 35
+  Start position: (195.4, 847.7)
+  Target position: (301.2, 300.0)
+  Distance: 557.9m
+  Final success rate: 100.0%
+
+Scenario 44:
+  Episode range: 2517 - 2552
+  Total episodes: 35
+  Start position: (69.6, 848.5)
+  Target position: (172.4, 301.1)
+  Distance: 557.0m
+  Final success rate: 100.0%
+
+Scenario 45:
+  Episode range: 2552 - 2587
+  Total episodes: 35
+  Start position: (361.4, 513.4)
+  Target position: (72.9, 33.9)
+  Distance: 559.7m
+  Final success rate: 100.0%
+
+Scenario 46:
+  Episode range: 2587 - 2622
+  Total episodes: 35
+  Start position: (464.2, 138.5)
+  Target position: (823.2, 539.0)
+  Distance: 537.8m
+  Final success rate: 100.0%
+
+Scenario 47:
+  Episode range: 2622 - 2657
+  Total episodes: 35
+  Start position: (938.2, 441.9)
+  Target position: (503.5, 725.3)
+  Distance: 518.9m
+  Final success rate: 100.0%
+
+Scenario 48:
+  Episode range: 2657 - 2692
+  Total episodes: 35
+  Start position: (550.0, 700.0)
+  Target position: (57.1, 962.2)
+  Distance: 558.3m
+  Final success rate: 100.0%
+
+Scenario 49:
+  Episode range: 2692 - 2727
+  Total episodes: 35
+  Start position: (760.4, 338.0)
+  Target position: (589.6, 910.6)
+  Distance: 597.6m
+  Final success rate: 96.7%
+
+Scenario 50:
+  Episode range: 2727 - 2762
+  Total episodes: 35
+  Start position: (725.8, 814.8)
+  Target position: (164.8, 612.8)
+  Distance: 596.3m
+  Final success rate: 90.0%
+
+Scenario 51:
+  Episode range: 2762 - 2797
+  Total episodes: 35
+  Start position: (520.3, 101.3)
+  Target position: (270.4, 631.9)
+  Distance: 586.5m
+  Final success rate: 100.0%
+
+Scenario 52:
+  Episode range: 2797 - 2832
+  Total episodes: 35
+  Start position: (821.1, 746.3)
+  Target position: (625.9, 219.3)
+  Distance: 562.0m
+  Final success rate: 93.3%
+
+Scenario 53:
+  Episode range: 2832 - 2867
+  Total episodes: 35
+  Start position: (837.9, 941.5)
+  Target position: (526.5, 459.3)
+  Distance: 574.0m
+  Final success rate: 100.0%
+
+Scenario 54:
+  Episode range: 2867 - 2902
+  Total episodes: 35
+  Start position: (330.2, 389.4)
+  Target position: (754.3, 741.4)
+  Distance: 551.2m
+  Final success rate: 96.7%
+
+Scenario 55:
+  Episode range: 2902 - 2937
+  Total episodes: 35
+  Start position: (79.5, 841.1)
+  Target position: (629.9, 853.6)
+  Distance: 550.5m
+  Final success rate: 100.0%
+
+Scenario 56:
+  Episode range: 2937 - 2972
+  Total episodes: 35
+  Start position: (443.1, 84.4)
+  Target position: (303.4, 612.9)
+  Distance: 546.7m
+  Final success rate: 100.0%
+
+Scenario 57:
+  Episode range: 2972 - 3007
+  Total episodes: 35
+  Start position: (651.8, 243.2)
+  Target position: (404.5, 745.6)
+  Distance: 559.9m
+  Final success rate: 93.3%
+
+Scenario 58:
+  Episode range: 3007 - 3042
+  Total episodes: 35
+  Start position: (409.8, 700.3)
+  Target position: (937.8, 787.6)
+  Distance: 535.1m
+  Final success rate: 100.0%
+
+Scenario 59:
+  Episode range: 3042 - 3077
+  Total episodes: 35
+  Start position: (419.5, 796.3)
+  Target position: (767.8, 336.0)
+  Distance: 577.3m
+  Final success rate: 100.0%
+
+Scenario 60:
+  Episode range: 3077 - 3112
+  Total episodes: 35
+  Start position: (279.1, 206.7)
+  Target position: (841.6, 296.9)
+  Distance: 569.7m
+  Final success rate: 90.0%
+
+Scenario 61:
+  Episode range: 3112 - 3147
+  Total episodes: 35
+  Start position: (129.1, 417.0)
+  Target position: (688.9, 531.3)
+  Distance: 571.4m
+  Final success rate: 93.3%
+
+Scenario 62:
+  Episode range: 3147 - 3182
+  Total episodes: 35
+  Start position: (769.6, 371.6)
+  Target position: (837.9, 955.2)
+  Distance: 587.6m
+  Final success rate: 96.7%
+
+Scenario 63:
+  Episode range: 3182 - 3217
+  Total episodes: 35
+  Start position: (118.0, 640.3)
+  Target position: (463.0, 172.2)
+  Distance: 581.5m
+  Final success rate: 96.7%
+
+Scenario 64:
+  Episode range: 3217 - 3252
+  Total episodes: 35
+  Start position: (919.4, 447.1)
+  Target position: (492.7, 44.7)
+  Distance: 586.5m
+  Final success rate: 96.7%
+
+Scenario 65:
+  Episode range: 3252 - 3287
+  Total episodes: 35
+  Start position: (780.5, 606.8)
+  Target position: (411.6, 169.5)
+  Distance: 572.1m
+  Final success rate: 83.3%
+
+Scenario 66:
+  Episode range: 3287 - 3381
+  Total episodes: 94
+  Start position: (276.6, 357.8)
+  Target position: (675.4, 805.5)
+  Distance: 599.6m
+  Final success rate: 50.0%
+
+Scenario 67:
+  Episode range: 3381 - 3416
+  Total episodes: 35
+  Start position: (417.6, 883.2)
+  Target position: (894.6, 565.9)
+  Distance: 572.9m
+  Final success rate: 96.7%
+
+Scenario 68:
+  Episode range: 3416 - 3451
+  Total episodes: 35
+  Start position: (163.2, 463.9)
+  Target position: (561.8, 854.9)
+  Distance: 558.4m
+  Final success rate: 86.7%
+
+Scenario 69:
+  Episode range: 3451 - 3486
+  Total episodes: 35
+  Start position: (332.7, 949.3)
+  Target position: (161.1, 422.3)
+  Distance: 554.3m
+  Final success rate: 96.7%
+
+Scenario 70:
+  Episode range: 3486 - 3521
+  Total episodes: 35
+  Start position: (421.2, 786.4)
+  Target position: (276.5, 273.7)
+  Distance: 532.8m
+  Final success rate: 93.3%
+
+Scenario 71:
+  Episode range: 3521 - 3556
+  Total episodes: 35
+  Start position: (525.7, 459.7)
+  Target position: (955.1, 858.5)
+  Distance: 586.1m
+  Final success rate: 93.3%
+
+Scenario 72:
+  Episode range: 3556 - 3591
+  Total episodes: 35
+  Start position: (369.4, 385.1)
+  Target position: (840.3, 47.6)
+  Distance: 579.4m
+  Final success rate: 93.3%
+
+Scenario 73:
+  Episode range: 3591 - 3626
+  Total episodes: 35
+  Start position: (901.7, 624.5)
+  Target position: (760.0, 70.9)
+  Distance: 571.4m
+  Final success rate: 76.7%
+
+Scenario 74:
+  Episode range: 3626 - 3661
+  Total episodes: 35
+  Start position: (62.3, 254.1)
+  Target position: (649.0, 310.2)
+  Distance: 589.4m
+  Final success rate: 90.0%
+
+Scenario 75:
+  Episode range: 3661 - 3696
+  Total episodes: 35
+  Start position: (937.3, 406.1)
+  Target position: (344.5, 373.0)
+  Distance: 593.8m
+  Final success rate: 100.0%
+
+Scenario 76:
+  Episode range: 3696 - 3731
+  Total episodes: 35
+  Start position: (60.5, 813.2)
+  Target position: (642.3, 939.2)
+  Distance: 595.3m
+  Final success rate: 100.0%
+
+Scenario 77:
+  Episode range: 3731 - 3766
+  Total episodes: 35
+  Start position: (307.4, 748.8)
+  Target position: (858.6, 954.4)
+  Distance: 588.4m
+  Final success rate: 83.3%
+
+Scenario 78:
+  Episode range: 3766 - 3801
+  Total episodes: 35
+  Start position: (649.1, 391.2)
+  Target position: (789.6, 961.5)
+  Distance: 587.4m
+  Final success rate: 93.3%
+
+Scenario 79:
+  Episode range: 3801 - 3836
+  Total episodes: 35
+  Start position: (334.1, 424.0)
+  Target position: (556.1, 953.5)
+  Distance: 574.2m
+  Final success rate: 93.3%
+
+Scenario 80:
+  Episode range: 3836 - 3871
+  Total episodes: 35
+  Start position: (56.2, 223.4)
+  Target position: (100.8, 786.2)
+  Distance: 564.5m
+  Final success rate: 96.7%
+
+Scenario 81:
+  Episode range: 3871 - 3906
+  Total episodes: 35
+  Start position: (551.2, 781.5)
+  Target position: (73.7, 472.4)
+  Distance: 568.8m
+  Final success rate: 96.7%
+
+Scenario 82:
+  Episode range: 3906 - 3941
+  Total episodes: 35
+  Start position: (721.1, 99.3)
+  Target position: (335.3, 538.7)
+  Distance: 584.7m
+  Final success rate: 100.0%
+
+Scenario 83:
+  Episode range: 3941 - 3976
+  Total episodes: 35
+  Start position: (814.7, 384.4)
+  Target position: (378.2, 750.8)
+  Distance: 569.9m
+  Final success rate: 100.0%
+
+Scenario 84:
+  Episode range: 3976 - 3999
+  Total episodes: 23
+  Start position: (791.0, 263.6)
+  Target position: (328.0, 574.5)
+  Distance: 557.7m
+  Final success rate: 100.0%
+
+================================================================================
+Long-Training Scenarios Details
+================================================================================
+
+Scenario 1 (Long Training):
+  Episodes: 499
+  Distance: 450.0m
+  Success rate: 50.0%
+  Checkpoint saved: ppo_model_scenario_1_episode_499.pth
+
+Scenario 16 (Long Training):
+  Episodes: 384
+  Distance: 571.9m
+  Success rate: 50.0%
+  Checkpoint saved: ppo_model_scenario_16_episode_1516.pth
+
