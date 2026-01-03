@@ -137,33 +137,81 @@ class MultiDronePathPlanningEnv(gym.Env):
             self.drone_positions = self.fixed_start_positions.copy()
             self.target_positions = self.fixed_target_positions.copy()
         else:
-            # Use random positions for each episode
-            self.drone_positions = np.random.uniform(
-                [0, 0], 
-                [self.world_size, self.world_size],
-                size=(self.num_drones, 2)
-            ).astype(np.float32)
+            # Use evenly distributed positions for each episode
+            edge_margin = 50.0
+            available_size = self.world_size - 2 * edge_margin
             
-            # Random target positions - ensure minimum distance from start
-            min_distance = self.world_size * 0.05  # 5% of world size
-            max_attempts = 10
+            # Calculate grid layout for even distribution
+            # Try to create a roughly square grid
+            grid_size = int(np.ceil(np.sqrt(self.num_drones)))
+            
+            self.drone_positions = np.zeros((self.num_drones, 2), dtype=np.float32)
             self.target_positions = np.zeros((self.num_drones, 2), dtype=np.float32)
             
+            # Generate evenly distributed start positions
             for i in range(self.num_drones):
-                for _ in range(max_attempts):
-                    target_pos = np.random.uniform(
-                        [0, 0], 
-                        [self.world_size, self.world_size]
-                    ).astype(np.float32)
-                    if np.linalg.norm(target_pos - self.drone_positions[i]) >= min_distance:
-                        self.target_positions[i] = target_pos
-                        break
+                # Use grid layout with some randomization
+                row = i // grid_size
+                col = i % grid_size
+                
+                # Calculate grid cell size
+                cell_width = available_size / grid_size
+                cell_height = available_size / grid_size
+                
+                # Add small random offset within cell for variety
+                offset_range = min(cell_width, cell_height) * 0.3  # 30% of cell size
+                offset_x = np.random.uniform(-offset_range, offset_range)
+                offset_y = np.random.uniform(-offset_range, offset_range)
+                
+                start_x = edge_margin + col * cell_width + cell_width / 2 + offset_x
+                start_y = edge_margin + row * cell_height + cell_height / 2 + offset_y
+                
+                # Ensure within bounds
+                start_x = np.clip(start_x, edge_margin, self.world_size - edge_margin)
+                start_y = np.clip(start_y, edge_margin, self.world_size - edge_margin)
+                
+                self.drone_positions[i] = np.array([start_x, start_y], dtype=np.float32)
+            
+            # Generate evenly distributed target positions (different from starts)
+            min_distance = self.world_size * 0.05  # 5% of world size
+            max_attempts = 20
+            
+            for i in range(self.num_drones):
+                # Use opposite grid position or nearby grid for target
+                # This ensures targets are also evenly distributed
+                target_row = (i + grid_size // 2) % grid_size
+                target_col = (i + 1) % grid_size
+                
+                cell_width = available_size / grid_size
+                cell_height = available_size / grid_size
+                
+                # Add random offset
+                offset_range = min(cell_width, cell_height) * 0.3
+                offset_x = np.random.uniform(-offset_range, offset_range)
+                offset_y = np.random.uniform(-offset_range, offset_range)
+                
+                target_x = edge_margin + target_col * cell_width + cell_width / 2 + offset_x
+                target_y = edge_margin + target_row * cell_height + cell_height / 2 + offset_y
+                
+                # Ensure within bounds
+                target_x = np.clip(target_x, edge_margin, self.world_size - edge_margin)
+                target_y = np.clip(target_y, edge_margin, self.world_size - edge_margin)
+                
+                target_pos = np.array([target_x, target_y], dtype=np.float32)
+                
+                # Verify minimum distance
+                if np.linalg.norm(target_pos - self.drone_positions[i]) >= min_distance:
+                    self.target_positions[i] = target_pos
                 else:
-                    # Fallback: place target at minimum distance
-                    direction = np.random.uniform(-1, 1, size=2)
+                    # If too close, place at minimum distance in opposite direction
+                    direction = target_pos - self.drone_positions[i]
+                    if np.linalg.norm(direction) < 1e-6:
+                        # Random direction if same position
+                        angle = np.random.uniform(0, 2 * np.pi)
+                        direction = np.array([np.cos(angle), np.sin(angle)])
                     direction = direction / np.linalg.norm(direction)
                     self.target_positions[i] = self.drone_positions[i] + direction * min_distance
-                    self.target_positions[i] = np.clip(self.target_positions[i], 0, self.world_size)
+                    self.target_positions[i] = np.clip(self.target_positions[i], edge_margin, self.world_size - edge_margin)
         
         self.step_count = 0
         self.prev_distances = np.array([

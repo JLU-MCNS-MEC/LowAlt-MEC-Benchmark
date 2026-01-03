@@ -134,19 +134,42 @@ def train(
                 current_fixed_starts = []
                 current_fixed_targets = []
                 
+                # Generate evenly distributed positions
+                edge_margin = 50.0
+                available_size = env.world_size - 2 * edge_margin
+                grid_size = int(np.ceil(np.sqrt(num_drones)))
+                
                 for i in range(num_drones):
-                    # Spread start positions
-                    start_x = 200.0 + (i % 3) * 200.0
-                    start_y = 200.0 + (i // 3) * 200.0
+                    # Evenly distributed start positions using grid
+                    row = i // grid_size
+                    col = i % grid_size
+                    cell_width = available_size / grid_size
+                    cell_height = available_size / grid_size
+                    
+                    start_x = edge_margin + col * cell_width + cell_width / 2
+                    start_y = edge_margin + row * cell_height + cell_height / 2
                     start_pos = np.array([start_x, start_y], dtype=np.float32)
                     
-                    # Place target at fixed distance
-                    angle = 2 * np.pi * i / num_drones  # Spread targets around
-                    target_pos = start_pos + np.array([
-                        first_scenario_distance * 0.6 * np.cos(angle),
-                        first_scenario_distance * 0.8 * np.sin(angle)
-                    ], dtype=np.float32)
-                    target_pos = np.clip(target_pos, 50, env.world_size - 50)
+                    # Place target at fixed distance, but in different grid position for even distribution
+                    # Use opposite or shifted grid position
+                    target_row = (i + grid_size // 2) % grid_size
+                    target_col = (i + 1) % grid_size
+                    
+                    target_x = edge_margin + target_col * cell_width + cell_width / 2
+                    target_y = edge_margin + target_row * cell_height + cell_height / 2
+                    target_pos = np.array([target_x, target_y], dtype=np.float32)
+                    
+                    # Adjust target to be at approximately first_scenario_distance from start
+                    direction = target_pos - start_pos
+                    if np.linalg.norm(direction) > 1e-6:
+                        direction = direction / np.linalg.norm(direction)
+                    else:
+                        # Random direction if same position
+                        angle = 2 * np.pi * i / num_drones
+                        direction = np.array([np.cos(angle), np.sin(angle)])
+                    
+                    target_pos = start_pos + direction * first_scenario_distance
+                    target_pos = np.clip(target_pos, edge_margin, env.world_size - edge_margin)
                     
                     current_fixed_starts.append(start_pos)
                     current_fixed_targets.append(target_pos)
@@ -489,20 +512,51 @@ def generate_random_positions(world_size, num_drones, min_distance_ratio=0.3, ol
     start_positions = []
     target_positions = []
     edge_margin = 50.0
+    available_size = world_size - 2 * edge_margin
+    
+    # Calculate grid layout for even distribution
+    grid_size = int(np.ceil(np.sqrt(num_drones)))
     
     for i in range(num_drones):
-        # Spread start positions
-        start_x = edge_margin + (i % 3) * (world_size - 2 * edge_margin) / 3
-        start_y = edge_margin + (i // 3) * (world_size - 2 * edge_margin) / 3
+        # Evenly distributed start positions using grid
+        row = i // grid_size
+        col = i % grid_size
+        cell_width = available_size / grid_size
+        cell_height = available_size / grid_size
+        
+        # Add small random offset within cell for variety
+        offset_range = min(cell_width, cell_height) * 0.2  # 20% of cell size
+        offset_x = np.random.uniform(-offset_range, offset_range)
+        offset_y = np.random.uniform(-offset_range, offset_range)
+        
+        start_x = edge_margin + col * cell_width + cell_width / 2 + offset_x
+        start_y = edge_margin + row * cell_height + cell_height / 2 + offset_y
+        
+        # Ensure within bounds
+        start_x = np.clip(start_x, edge_margin, world_size - edge_margin)
+        start_y = np.clip(start_y, edge_margin, world_size - edge_margin)
         start_pos = np.array([start_x, start_y], dtype=np.float32)
         
+        # Generate target position in different grid cell for even distribution
         if target_distance is not None:
-            # Generate target at approximately target_distance from start
-            angle = np.random.uniform(0, 2 * np.pi)
-            target_pos = start_pos + np.array([
-                target_distance * np.cos(angle),
-                target_distance * np.sin(angle)
-            ], dtype=np.float32)
+            # Use shifted grid position for target
+            target_row = (i + grid_size // 2) % grid_size
+            target_col = (i + 1) % grid_size
+            
+            target_x = edge_margin + target_col * cell_width + cell_width / 2
+            target_y = edge_margin + target_row * cell_height + cell_height / 2
+            target_pos = np.array([target_x, target_y], dtype=np.float32)
+            
+            # Adjust to be at approximately target_distance from start
+            direction = target_pos - start_pos
+            if np.linalg.norm(direction) > 1e-6:
+                direction = direction / np.linalg.norm(direction)
+            else:
+                # Random direction if same position
+                angle = np.random.uniform(0, 2 * np.pi)
+                direction = np.array([np.cos(angle), np.sin(angle)])
+            
+            target_pos = start_pos + direction * target_distance
             target_pos = np.clip(target_pos, edge_margin, world_size - edge_margin)
             
             # Enforce distance limit
@@ -513,11 +567,20 @@ def generate_random_positions(world_size, num_drones, min_distance_ratio=0.3, ol
                 target_pos = start_pos + direction_vec * max_reasonable_distance
                 target_pos = np.clip(target_pos, edge_margin, world_size - edge_margin)
         else:
-            # Standard random generation
-            target_pos = np.random.uniform(
-                [edge_margin, edge_margin],
-                [world_size - edge_margin, world_size - edge_margin]
-            ).astype(np.float32)
+            # Standard: use different grid position
+            target_row = (i + grid_size // 2) % grid_size
+            target_col = (i + 1) % grid_size
+            
+            offset_range = min(cell_width, cell_height) * 0.2
+            offset_x = np.random.uniform(-offset_range, offset_range)
+            offset_y = np.random.uniform(-offset_range, offset_range)
+            
+            target_x = edge_margin + target_col * cell_width + cell_width / 2 + offset_x
+            target_y = edge_margin + target_row * cell_height + cell_height / 2 + offset_y
+            
+            target_x = np.clip(target_x, edge_margin, world_size - edge_margin)
+            target_y = np.clip(target_y, edge_margin, world_size - edge_margin)
+            target_pos = np.array([target_x, target_y], dtype=np.float32)
         
         start_positions.append(start_pos)
         target_positions.append(target_pos)
@@ -723,7 +786,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train multi-drone path planning with PPO')
     parser.add_argument('--num_drones', type=int, default=3, 
                        help='Number of drones (must be between 1 and 9, default: 3)')
-    parser.add_argument('--num_episodes', type=int, default=4000,
+    parser.add_argument('--num_episodes', type=int, default=3000,
                        help='Number of training episodes (default: 8000)')
     parser.add_argument('--max_steps', type=int, default=60,
                        help='Maximum steps per episode (default: 60)')
