@@ -1,8 +1,9 @@
 # Python
-__pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.pyc
 
 # Distribution / packaging
 .Python
@@ -46,11 +47,18 @@ ENV/
 
 # Plots (keep plots/ in root for reference images)
 # plots/ is explicitly tracked
+# But ignore plots in subdirectories to avoid large files
+path-planning/*/plots/
+path-planning/*/models/
 
-# Model checkpoints
-*.pth
+# Model checkpoints - ignore all .pth files
+**/*.pth
 *.pt
 *.ckpt
+
+# Backup files
+*.backup
+*~
 
 # Data files
 *.pkl
